@@ -1,7 +1,6 @@
 import { List, getPreferenceValues, ActionPanel, CopyToClipboardAction, showToast, ToastStyle, getSelectedText } from "@raycast/api";
 import { ReactElement, useEffect, useState } from "react";
 import translate from "@vitalets/google-translate-api";
-import supportedLanguagesByCode from "./supportedLanguagesByCode.json";
 import fetch from "node-fetch";
 
 let count = 0;
@@ -13,10 +12,14 @@ export default function Command(): ReactElement {
   const [selectedText, setSelectedText] = useState("");
 
   async function FetchSelectedText() {
-    const select_text = await getSelectedText();;
-    select_text_strip = select_text.trim().replace(/(\r\n|\n|\r)/gm, "");
-    setSelectedText(select_text_strip);
-    setToTranslate(select_text);
+    try {
+      const select_text = await getSelectedText();
+      var select_text_strip = select_text.trim().replace(/(\r\n|\n|\r)/gm, "");
+      setSelectedText(select_text_strip);
+      setToTranslate(select_text);
+    } catch(err) {
+      console.info("empty");
+    }
   }
 
   function TranslateByYoudao() {
@@ -28,12 +31,12 @@ export default function Command(): ReactElement {
       var results = [];
       if (json["errorCode"] === 0) {
         if (json.hasOwnProperty("basic")) {
-          for (explain of json["basic"]["explains"]) {
+          for (var explain of json["basic"]["explains"]) {
             results.push({text: explain, languages: "Youdao"});
           }
         }
         if (json.hasOwnProperty("translation")) {
-          for (explain of json["translation"]) {
+          for (var explain of json["translation"]) {
             results.push({text: explain, languages: "Youdao"});
           }
         }
